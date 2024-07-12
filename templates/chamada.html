@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Chamada</title>
+    <style>
+        .form-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Registro Colorado</h1>
+        <div class="form-container">
+             {% with messages = get_flashed_messages(with_categories=true) %}
+                 {% if messages %}
+                    <div class="alert alert-danger">
+                        {% for category, message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <form method="post">
+                <div class="form-group row col-sm-12">
+                    <label for="nome">Membro:</label>
+                    <select class="form-control" id="nome" name="nome" required>
+                        <option>Selecione...</option>
+                        {% for pessoa in nomes %}
+                            <option value="{{ pessoa.id }}|{{ pessoa.nome }}">{{ pessoa.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group row col-sm-12">
+                    <label for="visitante">Visitante:</label>
+                    <input type="text" class="form-control" id="visitante" name="visitante">
+                </div>
+                <div class="form-group row col-sm-12">
+                    <label for="grupo">Grupo:</label>
+                    <select class="form-control" id="grupo" name="grupo" required>
+                        <option>Selecione...</option>
+                        <option value="Grupo A">Grupo A</option>
+                        <option value="Grupo B">Grupo B</option>
+                        <option value="Grupo C">Grupo C</option>
+                        <option value="Grupo D">Grupo D</option>
+                        <option value="Sem Grupo">Sem Grupo</option>
+                    </select>
+                </div>
+                <div class="form-group row col-sm-12">
+                    <label for="tipo">Tipo:</label>
+                    <select class="form-control" id="tipo" name="tipo" required>
+                        <option>Selecione...</option>
+                        <option value="Quarta-Feira">Quarta-Feira</option>
+                        <option value="Quinta-Feira">Quinta-Feira</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                        <option value="Domingo - EBD">Domingo - EBD</option>
+                        <option value="Madrugada">Madrugada</option>
+                    </select>
+                </div>
+                <div class="form-group row col-sm-12">
+                    <label for="data">Data:</label>
+                    <input type="date" class="form-control" id="data" name="data" required>
+                </div>
+                <div class="row col-sm-12">
+                    <div class="col-sm-6">
+                        <button type="submit" class="btn btn-success btn-block">Registrar</button>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block">Voltar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

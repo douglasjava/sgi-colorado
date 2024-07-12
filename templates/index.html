@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>SGI-Colorado</title>
+</head>
+<body>
+    <div class="container mt-5 form-container">
+        <h1 class="text-center">Controle de Presença</h1>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('chamada') }}" class="btn btn-primary">Chamada</a>
+            <a href="{{ url_for('pesquisa') }}" class="btn btn-secondary">Pesquisa</a>
+        </div>
+    </div>
+</body>
+</html>

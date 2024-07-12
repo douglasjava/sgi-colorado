@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Lista de Presença</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Lista de Presença</h1>
+
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="grupo" class="sr-only">Grupo</label>
+                        <select class="form-control" id="grupo" name="grupo">
+                            <option value="">Todos os Grupos</option>
+                            <option value="Grupo A">Grupo A</option>
+                            <option value="Grupo B">Grupo B</option>
+                            <option value="Grupo C">Grupo C</option>
+                            <option value="Grupo D">Grupo D</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="data" class="sr-only">Data</label>
+                        <input type="date" class="form-control" id="data" name="data">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
+                    <a href="{{ url_for('pesquisa') }}" class="btn btn-secondary mb-2 ml-2">Limpar</a>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Grupo</th>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for presenca in presencas %}
+                    <tr>
+                        {% set dados = presenca.split(';') %}
+                        <td>{{ dados[0] }}</td>
+                        <td>{{ dados[1] }}</td>
+                        <td>{{ dados[2] }}</td>
+                        <td>{{ dados[3] }}</td>
+                        <td>{{ dados[4] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="text-center">
+            <p>TOTAL: {{ presencas|length }}</p>
+        </div>
+
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
+        </div>
+
+    </div>
+</body>
+</html>

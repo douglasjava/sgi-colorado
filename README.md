@@ -6,8 +6,6 @@ Descrição breve sobre o que o seu projeto faz.
 
 - [Instalação](#instalação)
 - [Uso](#uso)
-- [Contribuindo](#contribuindo)
-- [Licença](#licença)
 
 ## Instalação
 
