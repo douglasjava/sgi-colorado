@@ -4,7 +4,7 @@ import csv
 from urllib.parse import parse_qs, urlparse
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Necessário para usar o flash
+app.secret_key = 'supersecretkey'
 
 
 def load_names():
