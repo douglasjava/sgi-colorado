@@ -37,7 +37,7 @@
             <form method="post">
                 <div class="form-group row col-sm-12">
                     <label for="nome">Membro:</label>
-                    <select class="form-control" id="nome" name="nome" required>
+                    <select class="form-control" id="nome" name="nome" multiple required>
                         <option>Selecione...</option>
                         {% for pessoa in nomes %}
                             <option value="{{ pessoa.id }}|{{ pessoa.nome }}">{{ pessoa.nome }}</option>
