@@ -1,2 +1,0 @@
-anaconda-navigator==2.1.1
-anaconda-project==0.10.1

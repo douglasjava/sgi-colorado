@@ -1,6 +1,4 @@
 name: sgi-colorado
 dependencies:
   - flask
-  - python=3.8
-  - numpy
-  - pandas
+  - python-3.12.4
