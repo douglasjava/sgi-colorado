@@ -1,29 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Chamada</title>
-    <style>
-        .form-container {
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-        }
-        .btn-container {
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
+    <title>ICM - COLORADO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Registro Colorado</h1>
+
+    <!-- Navbar Setup -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-danger">
+        <div class="container-fluid">
+            <!-- Navbar brand -->
+            <a class="navbar-brand text-light" href="{{ url_for('index') }}">
+                SGI-COLORADO
+            </a>
+            <!-- Navbar toggle button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+				<span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Top menu in navbar -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active text-light" aria-current="page" href="{{ url_for('chamada') }}">
+                            Chamada
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+                            Pesquisa
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Setup -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <img src="{{ url_for('static', filename='logo-colorado.png') }}" alt="Logo Colorado" width="100" class="logo-img mb-4">
+            <h5 class="offcanvas-title text-danger">
+                SGI-COLORADO
+            </h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body bg-danger">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('chamada') }}">
+                        Chamada
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+                        Pesquisa
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Content Below Navbar and Sidebar Menu -->
+    <div class="container-fluid">
+
+        <h1 class="text-center">Registrar presença</h1>
         <div class="form-container">
              {% with messages = get_flashed_messages(with_categories=true) %}
                  {% if messages %}
@@ -65,17 +109,22 @@
                     <label for="data">Data:</label>
                     <input type="date" class="form-control" id="data" name="data" required>
                 </div>
-                <div class="row col-sm-12">
-                    <div class="col-sm-6">
+                <div class="row col-sm-10 mt-5 align-items-center">
+                    <div class="col-sm-3">
                         <button type="submit" class="btn btn-success btn-block">Registrar</button>
                     </div>
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3">
                         <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block">Voltar</a>
                     </div>
                 </div>
             </form>
         </div>
+
     </div>
+
+    <!-- Include Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -84,4 +133,5 @@
     </script>
 
 </body>
+
 </html>

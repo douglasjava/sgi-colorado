@@ -1,20 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>SGI-Colorado</title>
+    <title>ICM - COLORADO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container mt-5 form-container">
-        <h1 class="text-center">Controle de Presença</h1>
-        <div class="text-center mt-4">
-            <a href="{{ url_for('chamada') }}" class="btn btn-primary">Chamada</a>
-            <a href="{{ url_for('pesquisa') }}" class="btn btn-secondary">Pesquisa</a>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Dashboard</a>
+
+    <!-- Navbar Setup -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-danger">
+        <div class="container-fluid">
+            <!-- Navbar brand -->
+            <a class="navbar-brand text-light" href="{{ url_for('index') }}">
+                SGI-COLORADO
+            </a>
+            <!-- Navbar toggle button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+				<span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Top menu in navbar -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active text-light" aria-current="page" href="{{ url_for('chamada') }}">
+                            Chamada
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+                            Pesquisa
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Setup -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <img src="{{ url_for('static', filename='logo-colorado.png') }}" alt="Logo Colorado" width="100" class="logo-img mb-4">
+            <h5 class="offcanvas-title text-danger">
+                SGI-COLORADO
+            </h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body bg-danger">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('chamada') }}">
+                        Chamada
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+                        Pesquisa
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
+
+    <!-- Content Below Navbar and Sidebar Menu -->
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- Gráfico de Presenças por Grupo -->
+            <div class="row">
+                <div class="col">
+                    <canvas id="chartPresencas"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico de Tipos de Presença -->
+            <div class="row mt-4">
+                <div class="col">
+                    <canvas id="chartTipos"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+ <!-- Biblioteca Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        // Dados dinâmicos do Flask para os gráficos
+        var presencasData = JSON.parse('{{ presencas|tojson|safe }}');
+
+        // Gráfico de Presenças por Grupo
+        var ctxPresencas = document.getElementById('chartPresencas').getContext('2d');
+        var chartPresencas = new Chart(ctxPresencas, {
+            type: 'bar',
+            data: {
+                labels: ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D'],
+                datasets: [{
+                    label: 'Presenças por Grupo',
+                    data: [
+                        presencasData.filter(item => item.grupo === 'GRUPO A').length,
+                        presencasData.filter(item => item.grupo === 'GRUPO B').length,
+                        presencasData.filter(item => item.grupo === 'GRUPO C').length,
+                        presencasData.filter(item => item.grupo === 'GRUPO D').length
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(163,163,15,0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(72,207,115)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Tipos de Presença
+        var ctxTipos = document.getElementById('chartTipos').getContext('2d');
+        var chartTipos = new Chart(ctxTipos, {
+            type: 'pie',
+            data: {
+                labels: ['Domingo', 'Domingo - EBD', 'Quarta', 'Quinta', 'Sábado'],
+                datasets: [{
+                    label: 'Tipos de Presença',
+                    data: [
+                        presencasData.filter(item => item.tipo === 'Domingo').length,
+                        presencasData.filter(item => item.tipo === 'DomingoEBD').length,
+                        presencasData.filter(item => item.tipo === 'Quarta').length,
+                        presencasData.filter(item => item.tipo === 'Quinta').length,
+                        presencasData.filter(item => item.tipo === 'Sábado').length
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(175,81,162,0.2)',
+                        'rgba(243,31,97,0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(137,188,124, 1)',
+                        'rgba(60,87,184, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+    </script>
 </body>
+
 </html>

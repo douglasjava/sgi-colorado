@@ -27,12 +27,26 @@ Descrição breve sobre o que o seu projeto faz.
     pip install -r requirements.txt
     ```
 
-## Uso
+## Estrutura
 
-Explique como usar o seu projeto. Pode incluir exemplos de código e/ou comandos.
-
-```python
-import seu_modulo
-
-# Exemplo de uso do seu projeto
-seu_modulo.funcao_principal()
+sgi-colorado
+├── static/
+│   ├── style.css
+├── template/
+│   ├── chamada.html
+│   ├── dashboard.html
+│   ├── index.html
+│   ├── pesquisa.html
+├── .gitignore
+├── .slugignore
+├── app.py
+├── base.csv
+├── create_insert_tables.py
+├── database.db
+├── database_manager.py
+├── environment.yml
+├── Procfile
+├── requirements.txt
+├── runtime.txt
+├── settings.py
+└── README.md
