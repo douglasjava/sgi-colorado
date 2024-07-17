@@ -26,27 +26,3 @@ Descrição breve sobre o que o seu projeto faz.
     ```bash
     pip install -r requirements.txt
     ```
-
-## Estrutura
-
-sgi-colorado
-├── static/
-│   ├── style.css
-├── template/
-│   ├── chamada.html
-│   ├── dashboard.html
-│   ├── index.html
-│   ├── pesquisa.html
-├── .gitignore
-├── .slugignore
-├── app.py
-├── base.csv
-├── create_insert_tables.py
-├── database.db
-├── database_manager.py
-├── environment.yml
-├── Procfile
-├── requirements.txt
-├── runtime.txt
-├── settings.py
-└── README.md
