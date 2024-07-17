@@ -26,13 +26,3 @@ Descrição breve sobre o que o seu projeto faz.
     ```bash
     pip install -r requirements.txt
     ```
-
-## Uso
-
-Explique como usar o seu projeto. Pode incluir exemplos de código e/ou comandos.
-
-```python
-import seu_modulo
-
-# Exemplo de uso do seu projeto
-seu_modulo.funcao_principal()

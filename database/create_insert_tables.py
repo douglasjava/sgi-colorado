@@ -1,12 +1,13 @@
-from database_manager import DatabaseManager
+from database_manager import DatabaseManager, insert_from_csv
 
 
 def main():
     db_manager = DatabaseManager()
-    csv_file = 'base.csv'  # Nome do arquivo CSV
+
+    csv_file = '../data/base.csv'  # Nome do arquivo CSV
 
     # Insere os registros do arquivo CSV na tabela `nomes`
-    db_manager.insert_from_csv(csv_file)
+    insert_from_csv(csv_file)
     print("Registros inseridos com sucesso!")
 
 

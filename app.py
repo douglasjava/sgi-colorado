@@ -1,51 +1,24 @@
 import os
-import sqlite3
 from io import StringIO
 
-from flask import Flask, render_template, request, redirect, url_for, flash, Response, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, Response
 
 import csv
 from urllib.parse import parse_qs, urlparse
+
+from database.database_manager import load_names, insert_presenca, load_result
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
 
-def load_names():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM pessoa')
-    pessoas = cur.fetchall()
-    conn.close()
-    return pessoas
-
-
-def load_result(grupo_filter=None, data_filter=None):
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    query = 'SELECT * FROM presenca p1 INNER JOIN pessoa p2 on p1.pessoa_id = p2.id WHERE 1=1'
-    params = []
-
-    if grupo_filter:
-        query += ' AND grupo = ?'
-        params.append(grupo_filter)
-
-    if data_filter:
-        query += ' AND data = ?'
-        params.append(data_filter)
-
-    cur.execute(query, params)
-    presenca = cur.fetchall()
-    conn.close()
-    return presenca
-
-
 @app.route('/')
 def index():
-    return render_template('index.html')
+    presencas = load_result()
+
+    presencasJson = [dict(row) for row in presencas]
+
+    return render_template('index.html', presencas=presencasJson)
 
 
 @app.route('/chamada', methods=['GET', 'POST'])
@@ -66,25 +39,12 @@ def chamada():
             flash('O campo tipo é obrigatório', 'error')
             return render_template('chamada.html', nomes=pessoas)
 
-        conn = sqlite3.connect('database.db')
-        cur = conn.cursor()
-
         if ids:
             for id in ids:
-                cur.execute('''
-                    INSERT INTO presenca (pessoa_id, data, tipo)
-                    VALUES (?, ?, ?)
-                ''', (id, data, tipo))
+                insert_presenca(pessoa_id=id, data=data, tipo=tipo)
 
-        # Adiciona o visitante se foi preenchido
         if visitante:
-            cur.execute('''
-                INSERT INTO presenca (nome_visitante, data, tipo)
-                VALUES (?, ?, ?)
-            ''', (visitante, data, tipo))
-
-        conn.commit()
-        conn.close()
+            insert_presenca(nome_visitante=visitante, data=data, tipo=tipo)
 
         return redirect(url_for('index'))
     return render_template('chamada.html', nomes=pessoas)
