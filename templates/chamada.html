@@ -65,9 +65,9 @@
     </div>
 
     <!-- Content Below Navbar and Sidebar Menu -->
-    <div class="container-fluid">
+    <div class="container-fluid" style="padding: 30px">
 
-        <h1 class="text-center">Registrar presença</h1>
+        <h1 class="text-center mt-2">REGISTRAR</h1>
         <div class="form-container">
              {% with messages = get_flashed_messages(with_categories=true) %}
                  {% if messages %}
@@ -79,7 +79,7 @@
                 {% endif %}
             {% endwith %}
             <form method="post">
-                <div class="form-group row col-sm-12">
+                <div class="form-group row col-sm-12 mt-3">
                     <label for="nome">Membro:</label>
                     <select class="form-control" id="nome" name="nome" multiple>
                         <option>Selecione...</option>
@@ -88,11 +88,11 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group row col-sm-12">
+                <div class="form-group row col-sm-12 mt-3">
                     <label for="visitante">Visitante:</label>
                     <input type="text" class="form-control" id="visitante" name="visitante">
                 </div>
-                <div class="form-group row col-sm-12">
+                <div class="form-group row col-sm-12 mt-3">
                     <label for="tipo">Tipo:</label>
                     <select class="form-control" id="tipo" name="tipo" required>
                         <option>Selecione...</option>
@@ -105,17 +105,13 @@
                         <option value="EstudoEBD">Estudo EBD</option>
                     </select>
                 </div>
-                <div class="form-group row col-sm-12">
+                <div class="form-group row col-sm-12 mt-3">
                     <label for="data">Data:</label>
                     <input type="date" class="form-control" id="data" name="data" required>
                 </div>
-                <div class="row col-sm-10 mt-5 align-items-center">
-                    <div class="col-sm-3">
-                        <button type="submit" class="btn btn-success btn-block">Registrar</button>
-                    </div>
-                    <div class="col-sm-3">
-                        <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block">Voltar</a>
-                    </div>
+                <div class="row col-sm-12 mt-5 align-items-center">
+                    <button type="submit" class="btn btn-success btn-block">Registrar</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block mt-2">Voltar</a>
                 </div>
             </form>
         </div>
