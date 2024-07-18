@@ -118,6 +118,18 @@ def count_pessoa_grupo():
     return group_counts
 
 
+def count_pessoa():
+    conn = get_connection()
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute('''SELECT COUNT(*) FROM pessoa''')
+
+    count = cur.fetchone()[0]
+
+    return count
+
+
 def insert_presenca(pessoa_id=None, nome_visitante=None, data=None, tipo=None):
     conn = get_connection()
     cur = conn.cursor()

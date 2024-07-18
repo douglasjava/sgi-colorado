@@ -104,6 +104,12 @@
                 </div>
             </div>
 
+            <div class="row mt-4">
+                <div class="col">
+                    <canvas id="chartTotalPercentual"></canvas>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -216,6 +222,42 @@
                     ],
                     borderWidth: 1
                 }]
+            }
+        });
+
+        var totalPresencas = '{{ totalPresenca }}';
+        var totalPessoas = '{{ total_registrado }}';
+        var percentualPresenca = (totalPresencas / totalPessoas) * 100;
+
+        var ctxTotalPercentual = document.getElementById('chartTotalPercentual').getContext('2d');
+        var chartTotalPercentual = new Chart(ctxTotalPercentual, {
+            type: 'doughnut',
+            data: {
+                labels: ['Presente', 'Ausente'],
+                datasets: [{
+                    data: [percentualPresenca, 100 - percentualPresenca],
+                    backgroundColor: [
+                        'rgba(72, 207, 115, 0.2)', // Cor para 'Presente'
+                        'rgba(255, 99, 132, 0.2)'  // Cor para 'Ausente'
+                    ],
+                    borderColor: [
+                        'rgba(72, 207, 115, 1)', // Cor da borda para 'Presente'
+                        'rgba(255, 99, 132, 1)'  // Cor da borda para 'Ausente'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Percentual Total de Presença'
+                    }
+                }
             }
         });
 

@@ -6,7 +6,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, Res
 import csv
 from urllib.parse import parse_qs, urlparse
 
-from database.database_manager import load_names, insert_presenca, load_result, remover_chamada, count_pessoa_grupo
+from database.database_manager import load_names, insert_presenca, load_result, remover_chamada, count_pessoa_grupo, \
+    count_pessoa
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -18,16 +19,20 @@ def index():
 
     presencas = load_result(data_filter=data_filter)
     countGroup = count_pessoa_grupo()
-
-    for presenca in presencas:
-        print(dict(presenca))
-    print(countGroup)
+    total_registrado = count_pessoa()
 
     presencasJson = [dict(row) for row in presencas]
 
     presence_percentage = calculate_presence_percentage(presencas, countGroup)
+    totalPresenca = len(presencas)
 
-    return render_template('index.html', presencas=presencasJson, porcentage=presence_percentage)
+    for presenca in presencas:
+        print(dict(presenca))
+    print(countGroup)
+    print(total_registrado)
+    print(totalPresenca)
+
+    return render_template('index.html', presencas=presencasJson, porcentage=presence_percentage, totalPresenca=totalPresenca, total_registrado=total_registrado)
 
 
 @app.route('/buscar', methods=['GET'])
