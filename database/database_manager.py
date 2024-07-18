@@ -1,14 +1,16 @@
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
 import csv
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DATABASE_DIR = os.path.join(BASE_DIR, '../data')
-DATABASE_URL = os.environ.get('DATABASE_URL', os.path.join(DATABASE_DIR, 'database_prd.db'))
+DATABASE_URL = os.environ.get('DATABASE_URL',
+                              'postgres://ue43jbcd11q1dj:pb84d8471a74cb5095b464cc831c7309c2031d5d3fee8d853f6b4ff067bbdd5cc@c5hilnj7pn10vb.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/driss6kr58v7a')
 
 
 def get_connection():
-    return sqlite3.connect(DATABASE_URL)
+    return psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
 
 
 def create_db_pessoa():
@@ -16,7 +18,7 @@ def create_db_pessoa():
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS pessoa (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
             situacao TEXT NOT NULL,
             grupo TEXT NOT NULL,
@@ -32,10 +34,10 @@ def create_db_presenca():
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS presenca (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             pessoa_id INTEGER,
             nome_visitante TEXT,
-            data TEXT,
+            data DATE,
             tipo TEXT,
             FOREIGN KEY (pessoa_id) REFERENCES pessoa (id)
         )
@@ -46,7 +48,6 @@ def create_db_presenca():
 
 def load_names():
     conn = get_connection()
-    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute('SELECT * FROM pessoa')
     pessoas = cur.fetchall()
@@ -56,18 +57,32 @@ def load_names():
 
 def load_result(grupo_filter=None, data_filter=None, visitante_filter=None):
     conn = get_connection()
-    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    query = 'SELECT * FROM presenca p1 LEFT JOIN pessoa p2 on p1.pessoa_id = p2.id WHERE 1=1'
+    query = '''
+          SELECT 
+              p1.id, 
+              p1.pessoa_id, 
+              p1.nome_visitante, 
+              p1.data, 
+              p1.tipo,
+              p2.id AS pessoa_id, 
+              p2.nome, 
+              p2.situacao, 
+              p2.grupo, 
+              p2.categoria
+          FROM presenca p1 
+          LEFT JOIN pessoa p2 ON p1.pessoa_id = p2.id 
+          WHERE 1=1
+      '''
     params = []
 
     if grupo_filter:
-        query += ' AND grupo = ?'
+        query += ' AND grupo = %s'
         params.append(grupo_filter)
 
     if data_filter:
-        query += ' AND data = ?'
+        query += ' AND data = %s'
         params.append(data_filter)
 
     if visitante_filter == 'SIM':
@@ -84,7 +99,7 @@ def insert_nome(nome, situacao, grupo, categoria):
     cur = conn.cursor()
     cur.execute('''
         INSERT INTO pessoa (nome, situacao, grupo, categoria)
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s)
     ''', (nome, situacao, grupo, categoria))
     conn.commit()
     conn.close()
@@ -93,14 +108,13 @@ def insert_nome(nome, situacao, grupo, categoria):
 def remover_chamada(presenca_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM presenca WHERE id = ?", (presenca_id,))
+    cursor.execute("DELETE FROM presenca WHERE id = %s", (presenca_id,))
     conn.commit()
     conn.close()
 
 
 def count_pessoa_grupo():
     conn = get_connection()
-    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     cur.execute(''' 
@@ -120,13 +134,10 @@ def count_pessoa_grupo():
 
 def count_pessoa():
     conn = get_connection()
-    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-
     cur.execute('''SELECT COUNT(*) FROM pessoa''')
-
-    count = cur.fetchone()[0]
-
+    count = cur.fetchone()['count']
+    conn.close()
     return count
 
 
@@ -138,26 +149,26 @@ def insert_presenca(pessoa_id=None, nome_visitante=None, data=None, tipo=None):
     if pessoa_id:
         cur.execute('''
             SELECT COUNT(*) FROM presenca 
-            WHERE pessoa_id = ? AND data = ? AND tipo = ?
+            WHERE pessoa_id = %s AND data = %s AND tipo = %s
         ''', (pessoa_id, data, tipo))
-        count = cur.fetchone()[0]
+        count = cur.fetchone()['count']
         if count == 0:
             cur.execute('''
                 INSERT INTO presenca (pessoa_id, data, tipo)
-                VALUES (?, ?, ?)
+                VALUES (%s, %s, %s)
             ''', (pessoa_id, data, tipo))
 
     # Verifica se a presenca já existe para nome_visitante
     if nome_visitante:
         cur.execute('''
             SELECT COUNT(*) FROM presenca 
-            WHERE nome_visitante = ? AND data = ? AND tipo = ?
+            WHERE nome_visitante = %s AND data = %s AND tipo = %s
         ''', (nome_visitante, data, tipo))
-        count = cur.fetchone()[0]
+        count = cur.fetchone()['count']
         if count == 0:
             cur.execute('''
                 INSERT INTO presenca (nome_visitante, data, tipo)
-                VALUES (?, ?, ?)
+                VALUES (%s, %s, %s)
             ''', (nome_visitante, data, tipo))
 
     conn.commit()
