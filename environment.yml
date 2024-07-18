@@ -2,3 +2,4 @@ name: sgi-colorado
 dependencies:
   - flask
   - python=3.8
+  - psycopg2
