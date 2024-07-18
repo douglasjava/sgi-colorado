@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 
 <head>
     <meta charset="UTF-8">
@@ -69,9 +69,20 @@
 
         <h1 class="text-center mb-4 mt-2">LISTA DE PRESENÇA</h1>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+             {% if messages %}
+                <div class="alert alert-success">
+                    {% for category, message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+
         <form method="get" class="mb-4">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="grupo" class="sr-only">Grupo</label>
                         <select class="form-control" id="grupo" name="grupo">
@@ -83,10 +94,19 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="data" class="sr-only">Data</label>
                         <input type="date" class="form-control" id="data" name="data">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="visitante" class="sr-only">Visitante</label>
+                        <select class="form-control" id="visitante" name="visitante">
+                            <option value="NAO">NÃO</option>
+                            <option value="SIM">SIM</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -109,16 +129,36 @@
                         <th>Grupo</th>
                         <th>Data</th>
                         <th>Tipo</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                      {% for presenca in presencas %}
                         <tr>
                             <td>{{ presenca['id'] }}</td>
-                            <td>{{ presenca['nome'] }}</td>
-                            <td>{{ presenca['grupo'] }}</td>
+                            <td>
+                                {% if presenca['nome'] %}
+                                    {{ presenca['nome'] }}
+                                {% endif %}
+                                {% if presenca['nome_visitante'] %}
+                                    {{ presenca['nome_visitante'] }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if presenca['grupo'] %}
+                                    {{ presenca['grupo'] }}
+                                {% endif %}
+                                {% if presenca['nome_visitante'] %}
+                                    -
+                                {% endif %}
+                            </td>
                             <td>{{ presenca['data'] }}</td>
                             <td>{{ presenca['tipo'] }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('delete_presenca', presenca_id=presenca['id']) }}" onsubmit="return confirm('Tem certeza que deseja excluir esta presença?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

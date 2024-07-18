@@ -54,12 +54,12 @@ def load_names():
     return pessoas
 
 
-def load_result(grupo_filter=None, data_filter=None):
+def load_result(grupo_filter=None, data_filter=None, visitante_filter=None):
     conn = get_connection()
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    query = 'SELECT * FROM presenca p1 INNER JOIN pessoa p2 on p1.pessoa_id = p2.id WHERE 1=1'
+    query = 'SELECT * FROM presenca p1 LEFT JOIN pessoa p2 on p1.pessoa_id = p2.id WHERE 1=1'
     params = []
 
     if grupo_filter:
@@ -69,6 +69,9 @@ def load_result(grupo_filter=None, data_filter=None):
     if data_filter:
         query += ' AND data = ?'
         params.append(data_filter)
+
+    if visitante_filter == 'SIM':
+        query += ' AND pessoa_id IS NULL'
 
     cur.execute(query, params)
     presenca = cur.fetchall()
@@ -85,6 +88,34 @@ def insert_nome(nome, situacao, grupo, categoria):
     ''', (nome, situacao, grupo, categoria))
     conn.commit()
     conn.close()
+
+
+def remover_chamada(presenca_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM presenca WHERE id = ?", (presenca_id,))
+    conn.commit()
+    conn.close()
+
+
+def count_pessoa_grupo():
+    conn = get_connection()
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute(''' 
+        SELECT grupo, COUNT(*) as total
+        FROM pessoa
+        WHERE grupo IN ('GRUPO A', 'GRUPO B', 'GRUPO C', 'GRUPO D')
+        GROUP BY grupo;
+    ''')
+
+    count_group = cur.fetchall()
+    conn.close()
+
+    group_counts = {row['grupo']: row['total'] for row in count_group}
+
+    return group_counts
 
 
 def insert_presenca(pessoa_id=None, nome_visitante=None, data=None, tipo=None):
@@ -134,4 +165,3 @@ class DatabaseManager:
         self.db_name = db_name
         create_db_pessoa()
         create_db_presenca()
-

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 
 <head>
     <meta charset="UTF-8">
@@ -66,6 +66,21 @@
 
     <!-- Content Below Navbar and Sidebar Menu -->
     <div class="container-fluid">
+
+        <div class="col-md-12 mt-3 mb-3">
+            <form action="{{ url_for('buscar_presencas') }}" method="GET">
+                <div class="row align-items-end">
+                    <div class="form-group col-md-6">
+                        <label for="data" class="sr-only">Data</label>
+                        <input type="date" class="form-control" id="data" name="data">
+                    </div>
+                    <div class="col-md-6 text-center mt-2">
+                        <button type="submit" class="btn btn-danger mb-2">Buscar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <div class="row">
 
             <!-- Gráfico de Presenças por Grupo -->
@@ -82,43 +97,53 @@
                 </div>
             </div>
 
+            <!-- Gráfico de Percentual por Grupo -->
+            <div class="row mt-4">
+                <div class="col">
+                    <canvas id="chartPercentual"></canvas>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Include Bootstrap JavaScript -->
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
- <!-- Biblioteca Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
         // Dados dinâmicos do Flask para os gráficos
         var presencasData = JSON.parse('{{ presencas|tojson|safe }}');
+        var percentuaisGrupo = JSON.parse('{{ porcentage|tojson|safe }}');
 
         // Gráfico de Presenças por Grupo
         var ctxPresencas = document.getElementById('chartPresencas').getContext('2d');
         var chartPresencas = new Chart(ctxPresencas, {
             type: 'bar',
             data: {
-                labels: ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D'],
+                labels: ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D', 'Sem Grupo'],
                 datasets: [{
                     label: 'Presenças por Grupo',
                     data: [
                         presencasData.filter(item => item.grupo === 'GRUPO A').length,
                         presencasData.filter(item => item.grupo === 'GRUPO B').length,
                         presencasData.filter(item => item.grupo === 'GRUPO C').length,
-                        presencasData.filter(item => item.grupo === 'GRUPO D').length
+                        presencasData.filter(item => item.grupo === 'GRUPO D').length,
+                        presencasData.filter(item => item.grupo === null).length,
                     ],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
                         'rgba(255, 206, 86, 0.2)',
-                        'rgba(163,163,15,0.2)'
+                        'rgba(163,163,15,0.2)',
+                        'rgba(244,60,154,0.2)'
                     ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
                         'rgba(255, 206, 86, 1)',
-                        'rgba(72,207,115)'
+                        'rgba(72,207,115)',
+                        'rgb(223,64,210)'
                     ],
                     borderWidth: 1
                 }]
@@ -165,6 +190,35 @@
                 }]
             }
         });
+
+        // Gráfico de Percentual por Grupo
+        var ctxPercentual = document.getElementById('chartPercentual').getContext('2d');
+        var chartPercentual = new Chart(ctxPercentual, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(percentuaisGrupo),
+                datasets: [{
+                    label: 'Percentual por Grupo',
+                    data: Object.values(percentuaisGrupo),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(72,207,115)',
+                        'rgba(244,60,154,0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(72,207,115,1)',
+                        'rgba(244,60,154,1)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+
     </script>
 </body>
 
