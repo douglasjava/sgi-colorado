@@ -70,12 +70,25 @@
         <div class="col-md-12 mt-3 mb-3">
             <form action="{{ url_for('buscar_presencas') }}" method="GET">
                 <div class="row align-items-end">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="data" class="sr-only">Data</label>
                         <input type="date" class="form-control" id="data" name="data">
                     </div>
-                    <div class="col-md-6 text-center mt-2">
-                        <button type="submit" class="btn btn-danger mb-2">Buscar</button>
+                    <div class="col-md-4">
+                        <label for="tipo">Tipo:</label>
+                        <select class="form-control" id="tipo" name="tipo" required>
+                            <option>Selecione...</option>
+                            <option value="Quarta">Quarta-Feira</option>
+                            <option value="Quinta">Quinta-Feira</option>
+                            <option value="Sábado">Sábado</option>
+                            <option value="Domingo">Domingo</option>
+                            <option value="DomingoEBD">Domingo - EBD</option>
+                            <option value="Madrugada">Madrugada</option>
+                            <option value="EstudoEBD">Estudo EBD</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mt-2">
+                        <button type="submit" class="btn btn-danger">Buscar</button>
                     </div>
                 </div>
             </form>
@@ -168,7 +181,7 @@
         var chartTipos = new Chart(ctxTipos, {
             type: 'pie',
             data: {
-                labels: ['Domingo', 'Domingo - EBD', 'Quarta', 'Quinta', 'Sábado'],
+                labels: ['Domingo', 'Domingo - EBD', 'Quarta', 'Quinta', 'Sábado', 'Madrugada'],
                 datasets: [{
                     label: 'Tipos de Presença',
                     data: [
@@ -176,21 +189,24 @@
                         presencasData.filter(item => item.tipo === 'DomingoEBD').length,
                         presencasData.filter(item => item.tipo === 'Quarta').length,
                         presencasData.filter(item => item.tipo === 'Quinta').length,
-                        presencasData.filter(item => item.tipo === 'Sábado').length
+                        presencasData.filter(item => item.tipo === 'Sábado').length,
+                        presencasData.filter(item => item.tipo === 'Madrugada').length
                     ],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
                         'rgba(255, 206, 86, 0.2)',
                         'rgba(175,81,162,0.2)',
-                        'rgba(243,31,97,0.2)'
+                        'rgba(243,31,97,0.2)',
+                        'rgba(227,193,152,0.2)'
                     ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
                         'rgba(255, 206, 86, 1)',
                         'rgba(137,188,124, 1)',
-                        'rgba(60,87,184, 1)'
+                        'rgba(60,87,184, 1)',
+                        'rgb(77,124,59)'
                     ],
                     borderWidth: 1
                 }]

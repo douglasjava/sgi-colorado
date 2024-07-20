@@ -16,8 +16,9 @@ app.secret_key = 'supersecretkey'
 @app.route('/')
 def index():
     data_filter = session.get('data_filter', None)
+    tipo_filter = session.get('tipo_filter', None)
 
-    presencas = load_result(data_filter=data_filter)
+    presencas = load_result(data_filter=data_filter, tipo_filter=tipo_filter)
     countGroup = count_pessoa_grupo()
     total_registrado = count_pessoa()
 
@@ -38,9 +39,11 @@ def index():
 @app.route('/buscar', methods=['GET'])
 def buscar_presencas():
     data = request.args.get('data')
+    tipo = request.args.get('tipo')
 
     # Armazena a data escolhida na sessão
     session['data_filter'] = data
+    session['tipo_filter'] = tipo
 
     # Redireciona de volta para a página principal
     return redirect(url_for('index'))
@@ -82,11 +85,12 @@ def pesquisa():
     grupo_filter = parsed_params.get('grupo', [''])[0]
     data_filter = parsed_params.get('data', [''])[0]
     visitante_filter = parsed_params.get('visitante', [''])[0]
+    tipo_filter = parsed_params.get('tipo', [''])[0]
 
-    print(f"Filtro aplicado: Grupo={grupo_filter}, Data={data_filter}")
+    print(f"Filtro aplicado: Filtros={parsed_params}")
 
     # Carrega os resultados com os filtros aplicados
-    presencas = load_result(grupo_filter, data_filter, visitante_filter)
+    presencas = load_result(grupo_filter, data_filter, visitante_filter, tipo_filter)
 
     for presenca in presencas:
         print(dict(presenca))

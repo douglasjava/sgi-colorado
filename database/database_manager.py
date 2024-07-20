@@ -55,7 +55,7 @@ def load_names():
     return pessoas
 
 
-def load_result(grupo_filter=None, data_filter=None, visitante_filter=None):
+def load_result(grupo_filter=None, data_filter=None, visitante_filter=None, tipo_filter=None):
     conn = get_connection()
     cur = conn.cursor()
 
@@ -85,8 +85,15 @@ def load_result(grupo_filter=None, data_filter=None, visitante_filter=None):
         query += ' AND data = %s'
         params.append(data_filter)
 
+    if tipo_filter:
+        query += ' AND tipo = %s'
+        params.append(tipo_filter)
+
     if visitante_filter == 'SIM':
         query += ' AND pessoa_id IS NULL'
+
+    if visitante_filter == 'NAO':
+        query += ' AND pessoa_id IS NOT NULL'
 
     cur.execute(query, params)
     presenca = cur.fetchall()

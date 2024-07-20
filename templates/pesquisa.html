@@ -100,14 +100,28 @@
                         <input type="date" class="form-control" id="data" name="data">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="visitante" class="sr-only">Visitante</label>
                         <select class="form-control" id="visitante" name="visitante">
+                            <option>Selecione...</option>
                             <option value="NAO">NÃO</option>
                             <option value="SIM">SIM</option>
                         </select>
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <label for="tipo">Tipo:</label>
+                    <select class="form-control" id="tipo" name="tipo" required>
+                        <option>Selecione...</option>
+                        <option value="Quarta">Quarta-Feira</option>
+                        <option value="Quinta">Quinta-Feira</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                        <option value="DomingoEBD">Domingo - EBD</option>
+                        <option value="Madrugada">Madrugada</option>
+                        <option value="EstudoEBD">Estudo EBD</option>
+                    </select>
                 </div>
             </div>
 
