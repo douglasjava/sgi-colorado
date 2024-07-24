@@ -92,10 +92,13 @@ def pesquisa():
     # Carrega os resultados com os filtros aplicados
     presencas = load_result(grupo_filter, data_filter, visitante_filter, tipo_filter)
 
+    count_visitante = sum(1 for item in presencas if item['nome_visitante'] is not None)
+    count_membro = sum(1 for item in presencas if item['nome_visitante'] is None)
+
     for presenca in presencas:
         print(dict(presenca))
 
-    return render_template('pesquisa.html', presencas=presencas)
+    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante, count_membro=count_membro)
 
 
 # Rota para fazer o download do arquivo CSV

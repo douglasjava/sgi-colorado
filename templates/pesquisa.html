@@ -179,9 +179,18 @@
             </table>
         </div>
 
-        <div class="text-center mt-3" style="color: #dc3545; font-size: 20px; font-weight: bold">
-            <p>TOTAL: {{ presencas|length }}</p>
+        <div class="row col-sm-12">
+            <div class="text-center mt-3 col-sm-4" style="color: #dc3545; font-size: 20px; font-weight: bold">
+                <p>TOTAL: {{ presencas|length }}</p>
+            </div>
+            <div class="text-center mt-3 col-sm-4" style="color: #dc3545; font-size: 20px; font-weight: bold">
+                <p>MEMBRO(S): {{ count_membro }}</p>
+            </div>
+            <div class="text-center mt-3 col-sm-4" style="color: #dc3545; font-size: 20px; font-weight: bold">
+                <p>VISITANTE(S): {{ count_visitante }}</p>
+            </div>
         </div>
+
 
     </div>
 
