@@ -92,19 +92,30 @@ def pesquisa():
     # Carrega os resultados com os filtros aplicados
     presencas = load_result(grupo_filter, data_filter, visitante_filter, tipo_filter)
 
+    count_visitante_Registrado = sum(1 for presenca in presencas if presenca['situacao'] == 'Visitante')
     count_visitante = sum(1 for item in presencas if item['nome_visitante'] is not None)
-    count_membro = sum(1 for item in presencas if item['nome_visitante'] is None)
+    count_membro = sum(1 for item in presencas if item['situacao'] == 'Membro')
+
+    count_visitante_total = count_visitante + count_visitante_Registrado
 
     for presenca in presencas:
         print(dict(presenca))
 
-    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante, count_membro=count_membro)
+    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante_total, count_membro=count_membro)
 
 
 # Rota para fazer o download do arquivo CSV
 @app.route('/download_csv')
 def download_csv():
-    presencas = load_result()
+
+    # Captura os parâmetros de filtro da URL
+    grupo_filter = request.args.get('grupo', '')
+    data_filter = request.args.get('data', '')
+    visitante_filter = request.args.get('visitante', '')
+    tipo_filter = request.args.get('tipo', '')
+
+    # Carrega os resultados com os filtros aplicados
+    presencas = load_result(grupo_filter, data_filter, visitante_filter, tipo_filter)
 
     # Cria um arquivo CSV em memória
     output = StringIO()
@@ -113,7 +124,8 @@ def download_csv():
     # Escreve os dados das presenças no arquivo CSV
     csv_writer.writerow(['ID', 'Nome', 'Grupo', 'Data', 'Tipo'])
     for presenca in presencas:
-        csv_writer.writerow([presenca['id'], presenca['nome'], presenca['grupo'], presenca['data'], presenca['tipo']])
+        nome = presenca['nome_visitante'] or presenca['nome']
+        csv_writer.writerow([presenca['id'], nome, presenca['grupo'], presenca['data'], presenca['tipo']])
 
     # Retorna o arquivo CSV como uma resposta para download
     output.seek(0)
@@ -126,6 +138,7 @@ def download_csv():
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
+
     presencas = load_result()
 
     presencasJson = [dict(row) for row in presencas]

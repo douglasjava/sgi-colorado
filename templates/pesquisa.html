@@ -114,6 +114,8 @@
                     <label for="tipo">Tipo:</label>
                     <select class="form-control" id="tipo" name="tipo" required>
                         <option>Selecione...</option>
+                        <option value="Segunda">Segunda-Feira</option>
+                        <option value="Terca">Terça-Feira</option>
                         <option value="Quarta">Quarta-Feira</option>
                         <option value="Quinta">Quinta-Feira</option>
                         <option value="Sábado">Sábado</option>
@@ -129,7 +131,7 @@
             <div class="row">
                 <div class="col-md-12 text-center mt-2">
                     <button type="submit" class="btn btn-danger mb-2">Buscar</button>
-                    <a href="{{ url_for('download_csv') }}" class="btn btn-danger mb-2">Download</a>
+                    <a href="{{ url_for('download_csv', grupo=request.args.get('grupo', ''), data=request.args.get('data', ''), visitante=request.args.get('visitante', ''), tipo=request.args.get('tipo', '')) }}" class="btn btn-danger mb-2">Download</a>
                     <a href="{{ url_for('pesquisa') }}" class="btn btn-warning mb-2 ml-2">Limpar</a>
                 </div>
             </div>
