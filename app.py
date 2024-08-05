@@ -93,18 +93,20 @@ def pesquisa():
     presencas = load_result(grupo_filter, data_filter, visitante_filter, tipo_filter)
 
     count_visitante_Registrado = sum(1 for presenca in presencas if presenca['situacao'] == 'Visitante')
+    count_visitante_Frequente = sum(1 for presenca in presencas if presenca['situacao'] == 'Visitante Frequente')
     count_visitante = sum(1 for item in presencas if item['nome_visitante'] is not None)
     count_membro = sum(1 for item in presencas if item['situacao'] == 'Membro')
+    count_membro_nao_batizado = sum(1 for item in presencas if item['situacao'] == 'Membro não batizado')
 
-    count_visitante_total = count_visitante + count_visitante_Registrado
+    count_visitante_total = count_visitante + count_visitante_Registrado + count_visitante_Frequente
+    count_membros_total = count_membro + count_membro_nao_batizado
 
     for presenca in presencas:
         print(dict(presenca))
 
-    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante_total, count_membro=count_membro)
+    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante_total, count_membro=count_membros_total)
 
 
-# Rota para fazer o download do arquivo CSV
 @app.route('/download_csv')
 def download_csv():
 

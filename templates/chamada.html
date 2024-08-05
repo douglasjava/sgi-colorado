@@ -104,7 +104,6 @@
                         <option value="Domingo">Domingo</option>
                         <option value="DomingoEBD">Domingo - EBD</option>
                         <option value="Madrugada">Madrugada</option>
-                        <option value="EstudoEBD">Estudo EBD</option>
                         <option value="jovens">Jovens</option>
                     </select>
                 </div>
@@ -125,11 +124,61 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById('data').value = new Date().toISOString().split('T')[0];
-        });
-    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Define as opções para o formato de data brasileiro e fuso horário
+        const options = {
+            timeZone: "America/Sao_Paulo",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        };
+
+        // Obtém a data atual no fuso horário de São Paulo
+        const now = new Date();
+
+        // Formata a data no padrão ISO (YYYY-MM-DD)
+        const today = now.toLocaleDateString("pt-BR", options).split('/');
+        const formattedDate = `${today[2]}-${today[1]}-${today[0]}`;
+
+        // Define o valor do campo de data
+        document.getElementById('data').value = formattedDate;
+
+        // Obter o dia da semana atual
+        const weekDay = now.toLocaleDateString("pt-BR", { weekday: "long", timeZone: "America/Sao_Paulo" });
+
+        // Obter a hora atual
+        const currentHour = now.toLocaleString("pt-BR", { hour: "2-digit", hour12: false, timeZone: "America/Sao_Paulo" });
+
+        // Mapear nomes dos dias para os valores do dropdown
+        const dayMap = {
+			"segunda-feira": "Segunda",
+			"terça-feira": "Terca",
+			"quarta-feira": "Quarta",
+			"quinta-feira": "Quinta",
+			"Domingo - EBD": "DomingoEBD",
+			"Madrugada": "Madrugada",
+			"sábado": "Sábado",
+			"domingo": "Domingo"
+        };
+
+        // Obter o valor correspondente para o tipo
+        let tipoValue = dayMap[weekDay.toLowerCase()];
+
+        // Verificar regras especiais
+        if (weekDay.toLowerCase() === "domingo" && currentHour >= 9 && currentHour < 12) {
+            tipoValue = "DomingoEBD";
+        } else if (currentHour >= 6 && currentHour < 7) {
+            tipoValue = "Madrugada";
+        }
+
+        // Selecionar o valor no dropdown se ele existir
+        const tipoSelect = document.getElementById('tipo');
+        if (tipoValue) {
+            tipoSelect.value = tipoValue;
+        }
+    });
+</script>
 
 </body>
 
