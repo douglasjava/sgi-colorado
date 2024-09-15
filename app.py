@@ -72,7 +72,9 @@ def chamada():
                 insert_presenca(pessoa_id=id, data=data, tipo=tipo)
 
         if visitante:
-            insert_presenca(nome_visitante=visitante.upper(), data=data, tipo=tipo)
+            visitantes = [v.strip().upper() for v in visitante.split(',')] if ',' in visitante else [visitante.strip().upper()]
+            for nome_visitante in visitantes:
+                insert_presenca(nome_visitante=nome_visitante, data=data, tipo=tipo)
 
         return redirect(url_for('index'))
     return render_template('chamada.html', nomes=pessoas)
@@ -97,14 +99,19 @@ def pesquisa():
     count_visitante = sum(1 for item in presencas if item['nome_visitante'] is not None)
     count_membro = sum(1 for item in presencas if item['situacao'] == 'Membro')
     count_membro_nao_batizado = sum(1 for item in presencas if item['situacao'] == 'Membro não batizado')
+    count_cias_1 = sum(1 for item in presencas if item['categoria'] == 'Adolescente')
+    count_cias_2 = sum(1 for item in presencas if item['categoria'] == 'Criança (Intermediário) 7-11')
+    count_cias_3 = sum(1 for item in presencas if item['categoria'] == 'Criança (Pequeno) 3-7')
+    count_cias_4 = sum(1 for item in presencas if item['categoria'] == 'Criança de Colo 0-3')
 
     count_visitante_total = count_visitante + count_visitante_Registrado + count_visitante_Frequente
     count_membros_total = count_membro + count_membro_nao_batizado
+    count_cias_total = count_cias_1 + count_cias_2 + count_cias_3 + count_cias_4;
 
     for presenca in presencas:
         print(dict(presenca))
 
-    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante_total, count_membro=count_membros_total)
+    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante_total, count_membro=count_membros_total, count_cias=count_cias_total)
 
 
 @app.route('/download_csv')
