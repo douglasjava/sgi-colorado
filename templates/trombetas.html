@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Visitantes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+  <!-- Navbar Setup -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-danger">
+    <div class="container-fluid">
+      <!-- Navbar brand -->
+      <a class="navbar-brand text-light" href="{{ url_for('index') }}">
+        SGI-COLORADO
+      </a>
+      <!-- Navbar toggle button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- Top menu in navbar -->
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active text-light" aria-current="page" href="{{ url_for('chamada') }}">
+              Chamada
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+              Pesquisa
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
+              Trombetas e Festas 4
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
+              Pesquisa Trombetas e Festas 4
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar Setup -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header">
+      <img src="{{ url_for('static', filename='logo-colorado.png') }}" alt="Logo Colorado" width="100" class="logo-img mb-4">
+      <h5 class="offcanvas-title text-danger">
+        SGI-COLORADO
+      </h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body bg-danger">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link text-light" href="{{ url_for('chamada') }}">
+            Chamada
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+            Pesquisa
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
+            Trombetas e Festas 4
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
+            Pesquisa Trombetas e Festas 4
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    <h2 class="text-center text-danger">Cadastro de Visitantes</h2>
+    <form id="visitor-form" class="space-y-6">
+      <div id="visitor-list">
+        <!-- Visitantes serão adicionados aqui -->
+      </div>
+
+      <button type="button" class="btn btn-outline-secondary w-100 mb-3" id="add-visitor">
+        <i class="bi bi-plus-circle me-2"></i>Adicionar Outra Pessoa
+      </button>
+      <button type="submit" class="btn btn-danger w-100">
+        <span id="loading-spinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+        <span id="submit-text">Registrar Todos</span>
+      </button>
+    </form>
+  </div>
+
+  <script>
+    const visitorList = document.getElementById("visitor-list");
+    const addVisitorButton = document.getElementById("add-visitor");
+    const visitorForm = document.getElementById("visitor-form");
+    const loadingSpinner = document.getElementById("loading-spinner");
+    const submitText = document.getElementById("submit-text");
+
+    // Armazena os visitantes
+    let visitors = [];
+
+    // Adiciona um novo visitante
+    function addVisitor() {
+      visitors.push({ name: "", phone: "", responsible: "" });
+      renderVisitors();
+    }
+
+    // Atualiza os valores do visitante
+    function updateVisitor(index, field, value) {
+      visitors[index][field] = value;
+    }
+
+    // Remove um visitante
+    function removeVisitor(index) {
+      visitors.splice(index, 1);
+      renderVisitors();
+    }
+
+    // Aplica a máscara ao campo de telefone
+    function applyPhoneMask(input) {
+      input.addEventListener("input", () => {
+        let value = input.value.replace(/\D/g, ""); // Remove caracteres não numéricos
+        value = value.replace(/^(\d{2})(\d)/g, "($1) $2"); // Adiciona o parêntese e espaço
+        value = value.replace(/(\d{5})(\d{4})$/, "$1-$2"); // Adiciona o hífen
+        input.value = value;
+      });
+    }
+
+    // Renderiza os visitantes no DOM
+    function renderVisitors() {
+      visitorList.innerHTML = "";
+      visitors.forEach((visitor, index) => {
+        const visitorElement = document.createElement("div");
+        visitorElement.className = "p-4 bg-light border rounded mb-3";
+
+        visitorElement.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Pessoa ${index + 1}</h5>
+            ${
+              visitors.length > 1
+                ? `<button type="button" class="btn btn-sm btn-danger" onclick="removeVisitor(${index})">
+                    <i class="bi bi-trash"></i> Remover
+                   </button>`
+                : ""
+            }
+          </div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Nome</label>
+              <input
+                type="text"
+                class="form-control"
+                value="${visitor.name}"
+                oninput="updateVisitor(${index}, 'name', this.value)"
+                required
+              >
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Telefone</label>
+              <input
+                type="tel"
+                class="form-control phone-mask"
+                value="${visitor.phone}"
+                oninput="updateVisitor(${index}, 'phone', this.value)"
+                required
+              >
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Responsável</label>
+              <input
+                type="text"
+                class="form-control"
+                value="${visitor.responsible}"
+                oninput="updateVisitor(${index}, 'responsible', this.value)"
+                required
+              >
+            </div>
+          </div>
+        `;
+
+        visitorList.appendChild(visitorElement);
+
+        // Aplica a máscara ao campo de telefone
+        const phoneInput = visitorElement.querySelector(".phone-mask");
+        applyPhoneMask(phoneInput);
+      });
+    }
+
+    // Lógica de submissão do formulário
+    visitorForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Exibe o loading
+      loadingSpinner.classList.remove("d-none");
+      submitText.textContent = "Registrando...";
+
+      try {
+        const response = await fetch("/trombetas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visitantes: visitors }),
+        });
+
+        if (!response.ok) throw new Error("Falha ao registrar visitantes.");
+
+        alert("Visitantes cadastrados com sucesso!");
+      } catch (error) {
+        console.error(error);
+        alert("Ocorreu um erro ao registrar os visitantes.");
+      } finally {
+        // Oculta o loading
+        loadingSpinner.classList.add("d-none");
+        submitText.textContent = "Registrar Todos";
+        visitorForm.reset();
+        visitors = [];
+        renderVisitors();
+      }
+    });
+
+    // Adiciona o primeiro visitante ao carregar a página
+    addVisitorButton.addEventListener("click", addVisitor);
+    addVisitor();
+  </script>
+</body>
+
+</html>

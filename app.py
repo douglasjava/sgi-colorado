@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from io import StringIO
 
 from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
@@ -7,11 +8,20 @@ import csv
 from urllib.parse import parse_qs, urlparse
 
 from database.database_manager import load_names, insert_presenca, load_result, remover_chamada, count_pessoa_grupo, \
-    count_pessoa
+    count_pessoa, insert_item_event_tf, pesquisa_event_tf
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
+DAYS_MAP = {
+    0: 'Segunda',
+    1: 'Terca',
+    2: 'Quarta',
+    3: 'Quinta',
+    4: 'Sexta',
+    5: 'Sábado',
+    6: 'Domingo'
+}
 
 @app.route('/')
 def index():
@@ -145,6 +155,41 @@ def download_csv():
     )
 
 
+@app.route('/download_tf_csv')
+def download_tf_csv():
+    try:
+        # Recupera os dados dos visitantes
+        visitantes = pesquisa_event_tf()
+
+        # Cria um arquivo CSV na memória
+        output = StringIO()
+        writer = csv.DictWriter(output, fieldnames=['Nome do Visitante', 'Telefone', 'Responsavel', 'Data do Evento'])
+        writer.writeheader()
+
+        for visitante in visitantes:
+            writer.writerow({
+                'Nome do Visitante': visitante['visitor_name'],
+                'Telefone': visitante['phone'],
+                'Responsavel': visitante['responsible'],
+                'Data do Evento': visitante['event_date'].strftime('%Y-%m-%d')  # Formata a data
+            })
+
+        # Rewind no StringIO
+        output.seek(0)
+
+        # Retorna a resposta com o CSV gerado
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={"Content-Disposition": "attachment;filename=visitantes.csv"}
+        )
+
+    except Exception as e:
+        print(f"Erro ao gerar o arquivo CSV: {e}")
+        flash("Erro ao gerar o arquivo CSV.", 'danger')
+        return redirect('/pesquisa_trombetas')
+
+
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
 
@@ -160,6 +205,51 @@ def delete_presenca(presenca_id):
     remover_chamada(presenca_id)
     flash('Registro excluído com sucesso!', 'success')
     return redirect(url_for('pesquisa'))
+
+
+@app.route('/trombetas', methods=['GET', 'POST'])
+def trombetas():
+    if request.method == 'GET':
+        return render_template('trombetas.html')
+
+    if request.method == 'POST':
+        try:
+            visitantes = request.json.get('visitantes', [])
+            data_register = datetime.now().strftime('%Y-%m-%d')
+
+            if not visitantes:
+                flash('Nenhum dado recebido!', 'danger')
+                return redirect('/trombetas')
+
+            for visitante in visitantes:
+                insert_item_event_tf(
+                    visitante['name'],
+                    visitante['phone'],
+                    visitante['responsible'],
+                    data_register
+                )
+
+            flash('Visitantes registrados com sucesso!', 'success')
+        except Exception as e:
+            print(f"Erro ao registrar os visitantes: ", e)
+            flash(f'Ocorreu um erro ao registrar os visitantes: {str(e)}', 'danger')
+
+        return redirect('/trombetas')
+
+
+@app.route('/pesquisa_trombetas', methods=['GET'])
+def pesquisa_trombetas():
+    try:
+
+        visitantes = pesquisa_event_tf()
+
+        # Passa os dados para o template
+        return render_template('pesquisa_trombetas.html', visitantes=visitantes)
+
+    except Exception as e:
+        print(f"Erro ao consultar dados: {e}")
+        flash("Erro ao carregar os dados.", 'danger')
+        return redirect('/pesquisa_trombetas')
 
 
 def calculate_presence_percentage(presencas, count_group):

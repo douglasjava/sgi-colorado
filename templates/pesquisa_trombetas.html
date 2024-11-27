@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa Trombetas - ICM COLORADO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Navbar Setup -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-danger">
+        <div class="container-fluid">
+            <a class="navbar-brand text-light" href="{{ url_for('index') }}">
+                SGI-COLORADO
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active text-light" aria-current="page" href="{{ url_for('chamada') }}">
+                            Chamada
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+                            Pesquisa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
+                            Trombetas e Festas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
+                            Pesquisa Trombetas e Festas 4
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Setup -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <img src="{{ url_for('static', filename='logo-colorado.png') }}" alt="Logo Colorado" width="100" class="logo-img mb-4">
+            <h5 class="offcanvas-title text-danger">SGI-COLORADO</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body bg-danger">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('chamada') }}">
+                        Chamada
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
+                        Pesquisa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
+                        Trombetas e Festas 4
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
+                        Pesquisa Trombetas e Festas 4
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Content Below Navbar and Sidebar Menu -->
+    <div class="container-fluid">
+        <h1 class="text-center mb-4 mt-2">Pesquisa de Trombetas e Festas</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-success">
+                    {% for category, message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Botão de download -->
+        <div class="text-center mb-4">
+            <a href="{{ url_for('download_tf_csv') }}" class="btn btn-success">
+                Relatorio
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <th>Responsável</th>
+                        <th>Data do Evento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visitante in visitantes %}
+                        <tr>
+                            <td>{{ visitante['visitor_name'] }}</td>
+                            <td>{{ visitante['phone'] }}</td>
+                            <td>{{ visitante['responsible'] }}</td>
+                            <td>{{ visitante['event_date'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

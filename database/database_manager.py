@@ -111,7 +111,6 @@ def insert_nome(nome, situacao, grupo, categoria):
     conn.commit()
     conn.close()
 
-
 def remover_chamada(presenca_id):
     conn = get_connection()
     cursor = conn.cursor()
@@ -188,6 +187,26 @@ def insert_from_csv(csv_file):
         for row in reader:
             nome, situacao, grupo, categoria = row
             insert_nome(nome, situacao, grupo, categoria)
+
+
+def insert_item_event_tf(visitor_name, phone, responsible, event_date):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        INSERT INTO public.trombetas_festas(visitor_name, phone, responsible, event_date)
+        VALUES (%s, %s, %s, %s);
+    ''', (visitor_name, phone, responsible, event_date))  # Corrigido para passar as variáveis
+    conn.commit()
+    conn.close()
+
+def pesquisa_event_tf():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM public.trombetas_festas')
+    visitantes = cur.fetchall()
+    conn.close()
+
+    return visitantes
 
 
 class DatabaseManager:
