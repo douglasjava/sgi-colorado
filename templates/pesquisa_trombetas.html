@@ -106,8 +106,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>Telefone</th>
-                        <th>Responsável</th>
-                        <th>Data do Evento</th>
+                        <th>Quem Convidou</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -116,7 +115,6 @@
                             <td>{{ visitante['visitor_name'] }}</td>
                             <td>{{ visitante['phone'] }}</td>
                             <td>{{ visitante['responsible'] }}</td>
-                            <td>{{ visitante['event_date'] }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

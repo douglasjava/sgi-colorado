@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from io import StringIO
+import unicodedata
 
 from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
 
@@ -207,10 +208,18 @@ def delete_presenca(presenca_id):
     return redirect(url_for('pesquisa'))
 
 
+def remover_acentos(texto):
+    return ''.join(
+        char for char in unicodedata.normalize('NFD', texto)
+        if unicodedata.category(char) != 'Mn'
+    )
+
 @app.route('/trombetas', methods=['GET', 'POST'])
 def trombetas():
     if request.method == 'GET':
-        return render_template('trombetas.html')
+        list_people = load_names()
+        lista_de_pessoas = [remover_acentos(people['nome']) for people in list_people]
+        return render_template('trombetas.html', lista_de_pessoas=lista_de_pessoas)
 
     if request.method == 'POST':
         try:

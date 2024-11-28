@@ -7,6 +7,9 @@
   <title>Cadastro de Visitantes</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 </head>
 
 <body>
@@ -128,12 +131,22 @@
       renderVisitors();
     }
 
-    // Aplica a máscara ao campo de telefone
+
     function applyPhoneMask(input) {
       input.addEventListener("input", () => {
         let value = input.value.replace(/\D/g, ""); // Remove caracteres não numéricos
-        value = value.replace(/^(\d{2})(\d)/g, "($1) $2"); // Adiciona o parêntese e espaço
-        value = value.replace(/(\d{5})(\d{4})$/, "$1-$2"); // Adiciona o hífen
+
+        // Limita o número a 11 dígitos (2 para DDD e 9 para o número)
+        value = value.slice(0, 11);
+
+        // Aplica a máscara
+        if (value.length > 2) {
+          value = value.replace(/^(\d{2})(\d)/g, "($1) $2"); // Adiciona o parêntese e espaço
+        }
+        if (value.length > 7) {
+          value = value.replace(/(\d{5})(\d{1,4})$/, "$1-$2"); // Adiciona o hífen
+        }
+
         input.value = value;
       });
     }
@@ -178,10 +191,11 @@
               >
             </div>
             <div class="col-md-4">
-              <label class="form-label">Responsável</label>
+              <label class="form-label">Quem Convidou?</label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control autocomplete"
+                id="responsavel-input"
                 value="${visitor.responsible}"
                 oninput="updateVisitor(${index}, 'responsible', this.value)"
                 required
@@ -232,6 +246,18 @@
     // Adiciona o primeiro visitante ao carregar a página
     addVisitorButton.addEventListener("click", addVisitor);
     addVisitor();
+    $(document).ready(function () {
+  // Recebe a lista de pessoas do backend
+  const listaDePessoas = {{ lista_de_pessoas | tojson }};
+
+
+  $(document).on('focus', '.autocomplete', function () {
+      $(this).autocomplete({
+        source: listaDePessoas,
+        minLength: 1,
+      });
+    });
+  });
   </script>
 </body>
 
