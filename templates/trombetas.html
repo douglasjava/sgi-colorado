@@ -246,19 +246,25 @@
     // Adiciona o primeiro visitante ao carregar a página
     addVisitorButton.addEventListener("click", addVisitor);
     addVisitor();
+
     $(document).ready(function () {
-  // Recebe a lista de pessoas do backend
-  const listaDePessoas = {{ lista_de_pessoas | tojson }};
+      const listaDePessoas = {{ lista_de_pessoas | tojson }};
 
-
-  $(document).on('focus', '.autocomplete', function () {
-      $(this).autocomplete({
-        source: listaDePessoas,
-        minLength: 1,
+      $(document).on("focus", ".autocomplete", function () {
+        const input = $(this);
+        input.autocomplete({
+          source: listaDePessoas,
+          minLength: 1,
+          select: function (event, ui) {
+            const index = $(this).closest(".p-4").index();
+            updateVisitor(index, "responsible", ui.item.value);
+          },
+        });
       });
     });
-  });
+
   </script>
+
 </body>
 
 </html>
