@@ -34,16 +34,6 @@
                             Pesquisa
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
-                            Trombetas e Festas 4
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
-                            Pesquisa Trombetas e Festas 4
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -68,16 +58,6 @@
                 <li class="nav-item">
                     <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
                         Pesquisa
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
-                        Trombetas e Festas 4
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
-                        Pesquisa Trombetas e Festas 4
                     </a>
                 </li>
             </ul>
@@ -162,7 +142,7 @@
         var chartPresencas = new Chart(ctxPresencas, {
             type: 'bar',
             data: {
-                labels: ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D', 'Sem Grupo'],
+                labels: ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D', 'Grupo E', 'Sem Grupo'],
                 datasets: [{
                     label: 'Presenças por Grupo',
                     data: [
@@ -170,6 +150,7 @@
                         presencasData.filter(item => item.grupo === 'GRUPO B').length,
                         presencasData.filter(item => item.grupo === 'GRUPO C').length,
                         presencasData.filter(item => item.grupo === 'GRUPO D').length,
+                        presencasData.filter(item => item.grupo === 'GRUPO E').length,
                         presencasData.filter(item => item.grupo === null).length,
                     ],
                     backgroundColor: [

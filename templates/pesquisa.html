@@ -34,16 +34,6 @@
                             Pesquisa
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
-                            Trombetas e Festas 4
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
-                            Pesquisa Trombetas e Festas 4
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -68,16 +58,6 @@
                 <li class="nav-item">
                     <a class="nav-link text-light" href="{{ url_for('pesquisa') }}">
                         Pesquisa
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ url_for('trombetas') }}">
-                        Trombetas e Festas 4
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-light" href="{{ url_for('pesquisa_trombetas') }}">
-                        Pesquisa Trombetas e Festas 4
                     </a>
                 </li>
             </ul>
@@ -115,9 +95,15 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="data" class="sr-only">Data</label>
-                        <input type="date" class="form-control" id="data" name="data">
+                    <div class="form-group d-flex justify-content-between align-items-center">
+                        <div style="width: 48%;">
+                            <label for="data" class="sr-only">Data Inicial</label>
+                            <input type="date" class="form-control" id="data" name="data">
+                        </div>
+                        <div style="width: 48%;">
+                            <label for="data-fim" class="sr-only">Data Final</label>
+                            <input type="date" class="form-control" id="data-fim" name="data-fim">
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -152,25 +138,38 @@
                     <button type="submit" class="btn btn-danger mb-2">Buscar</button>
                     <a href="{{ url_for('download_csv', grupo=request.args.get('grupo', ''), data=request.args.get('data', ''), visitante=request.args.get('visitante', ''), tipo=request.args.get('tipo', '')) }}" class="btn btn-danger mb-2">Download</a>
                     <a href="{{ url_for('pesquisa') }}" class="btn btn-warning mb-2 ml-2">Limpar</a>
+                    <button id="btn-delete-all" type="button" class="btn btn-warning mb-2 ml-2">Excluir Selecionados</button>
                 </div>
             </div>
         </form>
+
+        <div id="loading" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000; text-align: center; padding-top: 20%;">
+            <div>
+                <span style="font-size: 20px; font-weight: bold;">Processando...</span>
+                <br>
+                <div class="spinner-border text-primary" role="status" style="margin-top: 10px;">
+                    <span class="sr-only">Carregando...</span>
+                </div>
+            </div>
+        </div>
 
         <div style="height: 400px; overflow-y: auto;">
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>ID</th>
                         <th>Nome</th>
+                        <th>Categoria</th>
                         <th>Grupo</th>
                         <th>Data</th>
                         <th>Tipo</th>
-                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                      {% for presenca in presencas %}
                         <tr>
+                            <td><input type="checkbox" class="form-check-input" name="presenca_ids" value="{{ presenca['id'] }}"></td>
                             <td>{{ presenca['id'] }}</td>
                             <td>
                                 {% if presenca['nome'] %}
@@ -180,6 +179,7 @@
                                     {{ presenca['nome_visitante'] }}
                                 {% endif %}
                             </td>
+                            <td>{{ presenca['categoria'] or '-' }}</td>
                             <td>
                                 {% if presenca['grupo'] %}
                                     {{ presenca['grupo'] }}
@@ -190,11 +190,6 @@
                             </td>
                             <td>{{ presenca['data'] }}</td>
                             <td>{{ presenca['tipo'] }}</td>
-                            <td>
-                                <form method="post" action="{{ url_for('delete_presenca', presenca_id=presenca['id']) }}" onsubmit="return confirm('Tem certeza que deseja excluir esta presença?');">
-                                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
-                                </form>
-                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -224,59 +219,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Define as opções para o formato de data brasileiro e fuso horário
-        const options = {
-            timeZone: "America/Sao_Paulo",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
-        };
 
-        // Obtém a data atual no fuso horário de São Paulo
-        const now = new Date();
+     document.getElementById('btn-delete-all').addEventListener('click', async function () {
+        const selectedIds = Array.from(document.querySelectorAll('input[name="presenca_ids"]:checked'))
+            .map(input => input.value);
 
-        // Formata a data no padrão ISO (YYYY-MM-DD)
-        const today = now.toLocaleDateString("pt-BR", options).split('/');
-        const formattedDate = `${today[2]}-${today[1]}-${today[0]}`;
-
-        // Define o valor do campo de data
-        document.getElementById('data').value = formattedDate;
-
-        // Obter o dia da semana atual
-        const weekDay = now.toLocaleDateString("pt-BR", { weekday: "long", timeZone: "America/Sao_Paulo" });
-
-        // Obter a hora atual
-        const currentHour = now.toLocaleString("pt-BR", { hour: "2-digit", hour12: false, timeZone: "America/Sao_Paulo" });
-
-        // Mapear nomes dos dias para os valores do dropdown
-        const dayMap = {
-			"segunda-feira": "Segunda",
-			"terça-feira": "Terca",
-			"quarta-feira": "Quarta",
-			"quinta-feira": "Quinta",
-			"Domingo - EBD": "DomingoEBD",
-			"Madrugada": "Madrugada",
-			"sábado": "Sábado",
-			"domingo": "Domingo"
-        };
-
-        // Obter o valor correspondente para o tipo
-        let tipoValue = dayMap[weekDay.toLowerCase()];
-
-        // Verificar regras especiais
-        if (weekDay.toLowerCase() === "domingo" && currentHour >= 9 && currentHour < 12) {
-            tipoValue = "DomingoEBD";
-        } else if (currentHour >= 6 && currentHour < 7) {
-            tipoValue = "Madrugada";
+        if (selectedIds.length === 0) {
+            alert('Nenhuma presença selecionada para excluir.');
+            return;
         }
 
-        // Selecionar o valor no dropdown se ele existir
-        const tipoSelect = document.getElementById('tipo');
-        if (tipoValue) {
-            tipoSelect.value = tipoValue;
+        const loadingElement = document.getElementById('loading');
+        loadingElement.style.display = 'block';
+
+        try {
+            // Enviar requisição via fetch
+            const response = await fetch('/delete_presenca', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ presenca_ids: selectedIds })
+            });
+
+            if (response.ok) {
+                alert('Presenças selecionadas excluídas com sucesso!');
+                window.location.reload();
+            } else {
+                alert('Erro ao excluir presenças. Tente novamente.');
+            }
+        } catch (error) {
+            alert('Ocorreu um erro inesperado. Tente novamente.');
+        } finally {
+            loadingElement.style.display = 'none';
         }
+
     });
+
 </script>
 
 </body>

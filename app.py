@@ -3,7 +3,7 @@ from datetime import datetime
 from io import StringIO
 import unicodedata
 
-from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
+from flask import Flask, render_template, request, redirect, url_for, flash, Response, session, jsonify
 
 import csv
 from urllib.parse import parse_qs, urlparse
@@ -97,32 +97,36 @@ def pesquisa():
     parsed_params = parse_qs(parsed_url.query)
     grupo_filter = parsed_params.get('grupo', [''])[0]
     data_filter = parsed_params.get('data', [''])[0]
+    data_filter_fim = parsed_params.get('data-fim', [''])[0]
     visitante_filter = parsed_params.get('visitante', [''])[0]
     tipo_filter = parsed_params.get('tipo', [''])[0]
 
     print(f"Filtro aplicado: Filtros={parsed_params}")
 
-    # Carrega os resultados com os filtros aplicados
-    presencas = load_result(grupo_filter, data_filter, visitante_filter, tipo_filter)
+    if parsed_params:
+        presencas = load_result(grupo_filter, data_filter, visitante_filter, tipo_filter, data_filter_fim)
 
-    count_visitante_Registrado = sum(1 for presenca in presencas if presenca['situacao'] == 'Visitante')
-    count_visitante_Frequente = sum(1 for presenca in presencas if presenca['situacao'] == 'Visitante Frequente')
-    count_visitante = sum(1 for item in presencas if item['nome_visitante'] is not None)
-    count_membro = sum(1 for item in presencas if item['situacao'] == 'Membro')
-    count_membro_nao_batizado = sum(1 for item in presencas if item['situacao'] == 'Membro não batizado')
-    count_cias_1 = sum(1 for item in presencas if item['categoria'] == 'Adolescente')
-    count_cias_2 = sum(1 for item in presencas if item['categoria'] == 'Criança (Intermediário) 7-11')
-    count_cias_3 = sum(1 for item in presencas if item['categoria'] == 'Criança (Pequeno) 3-7')
-    count_cias_4 = sum(1 for item in presencas if item['categoria'] == 'Criança de Colo 0-3')
+        count_visitante_Registrado = sum(1 for presenca in presencas if presenca['situacao'] == 'Visitante')
+        count_visitante_Frequente = sum(1 for presenca in presencas if presenca['situacao'] == 'Visitante Frequente')
+        count_visitante = sum(1 for item in presencas if item['nome_visitante'] is not None)
+        count_membro = sum(1 for item in presencas if item['situacao'] == 'Membro')
+        count_membro_nao_batizado = sum(1 for item in presencas if item['situacao'] == 'Membro não batizado')
+        count_cias_1 = sum(1 for item in presencas if item['categoria'] == 'Adolescente')
+        count_cias_2 = sum(1 for item in presencas if item['categoria'] == 'Criança (Intermediário) 7-11')
+        count_cias_3 = sum(1 for item in presencas if item['categoria'] == 'Criança (Pequeno) 3-7')
+        count_cias_4 = sum(1 for item in presencas if item['categoria'] == 'Criança de Colo 0-3')
 
-    count_visitante_total = count_visitante + count_visitante_Registrado + count_visitante_Frequente
-    count_membros_total = count_membro + count_membro_nao_batizado
-    count_cias_total = count_cias_1 + count_cias_2 + count_cias_3 + count_cias_4;
+        count_visitante_total = count_visitante + count_visitante_Registrado + count_visitante_Frequente
+        count_membros_total = count_membro + count_membro_nao_batizado
+        count_cias_total = count_cias_1 + count_cias_2 + count_cias_3 + count_cias_4;
 
-    for presenca in presencas:
-        print(dict(presenca))
+        for presenca in presencas:
+            print(dict(presenca))
 
-    return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante_total, count_membro=count_membros_total, count_cias=count_cias_total)
+        return render_template('pesquisa.html', presencas=presencas, count_visitante=count_visitante_total, count_membro=count_membros_total, count_cias=count_cias_total)
+
+    else:
+        return render_template('pesquisa.html')
 
 
 @app.route('/download_csv')
@@ -201,11 +205,18 @@ def dashboard():
     return render_template('dashboard.html', presencas=presencasJson)
 
 
-@app.route('/delete_presenca/<int:presenca_id>', methods=['POST'])
-def delete_presenca(presenca_id):
-    remover_chamada(presenca_id)
-    flash('Registro excluído com sucesso!', 'success')
-    return redirect(url_for('pesquisa'))
+@app.route('/delete_presenca', methods=['POST'])
+def delete_presenca():
+    data = request.get_json()
+    presenca_ids = data.get('presenca_ids', [])
+
+    if not presenca_ids:
+        return jsonify({'error': 'Nenhuma presença selecionada'}), 400
+
+    for presenca_id in presenca_ids:
+        remover_chamada(presenca_id)
+
+    return jsonify({'message': 'Presenças selecionadas excluídas com sucesso'}), 200
 
 
 def remover_acentos(texto):
@@ -262,7 +273,7 @@ def pesquisa_trombetas():
 
 
 def calculate_presence_percentage(presencas, count_group):
-    presence_count = {'GRUPO A': 0, 'GRUPO B': 0, 'GRUPO C': 0, 'GRUPO D': 0}
+    presence_count = {'GRUPO A': 0, 'GRUPO B': 0, 'GRUPO C': 0, 'GRUPO D': 0, 'GRUPO E': 0}
 
     # Conta as presenças de cada grupo
     for presenca in presencas:

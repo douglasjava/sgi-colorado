@@ -55,7 +55,7 @@ def load_names():
     return pessoas
 
 
-def load_result(grupo_filter=None, data_filter=None, visitante_filter=None, tipo_filter=None):
+def load_result(grupo_filter=None, data_filter=None, visitante_filter=None, tipo_filter=None, data_filter_fim=None):
     conn = get_connection()
     cur = conn.cursor()
 
@@ -81,9 +81,14 @@ def load_result(grupo_filter=None, data_filter=None, visitante_filter=None, tipo
         query += ' AND grupo = %s'
         params.append(grupo_filter)
 
-    if data_filter:
-        query += ' AND data = %s'
+    if data_filter and data_filter_fim:
+        query += ' AND data BETWEEN %s AND %s'
+        params.extend([data_filter, data_filter_fim])
+    elif data_filter:
+        query += ' AND data >= %s'
         params.append(data_filter)
+    elif data_filter_fim:
+        pass
 
     if tipo_filter:
         query += ' AND tipo = %s'
@@ -126,7 +131,7 @@ def count_pessoa_grupo():
     cur.execute(''' 
         SELECT grupo, COUNT(*) as total
         FROM pessoa
-        WHERE grupo IN ('GRUPO A', 'GRUPO B', 'GRUPO C', 'GRUPO D')
+        WHERE grupo IN ('GRUPO A', 'GRUPO B', 'GRUPO C', 'GRUPO D', 'Grupo E')
         GROUP BY grupo;
     ''')
 
