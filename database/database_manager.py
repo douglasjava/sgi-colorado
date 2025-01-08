@@ -131,7 +131,7 @@ def count_pessoa_grupo():
     cur.execute(''' 
         SELECT grupo, COUNT(*) as total
         FROM pessoa
-        WHERE grupo IN ('GRUPO A', 'GRUPO B', 'GRUPO C', 'GRUPO D', 'Grupo E')
+        WHERE grupo IN ('GRUPO A', 'GRUPO B', 'GRUPO C', 'GRUPO D', 'GRUPO E')
         GROUP BY grupo;
     ''')
 
