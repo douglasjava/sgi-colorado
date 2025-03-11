@@ -49,7 +49,7 @@ def create_db_presenca():
 def load_names():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM pessoa')
+    cur.execute('SELECT * FROM pessoa ORDER BY nome')
     pessoas = cur.fetchall()
     conn.close()
     return pessoas
